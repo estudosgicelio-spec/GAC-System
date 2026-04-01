@@ -2,56 +2,78 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GAC - Gestão Administrativa e Compliance</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; color: #333; margin: 20px; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h2 { border-bottom: 2px solid #2c3e50; padding-bottom: 10px; color: #2c3e50; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { border-bottom: 3px solid #2c3e50; padding-bottom: 10px; color: #2c3e50; display: flex; justify-content: space-between; }
         
-        /* Formulário de Input */
-        .input-group { display: flex; gap: 10px; margin-bottom: 30px; background: #ecf0f1; padding: 15px; border-radius: 5px; }
-        input, select, button { padding: 10px; border: 1px solid #bdc3c7; border-radius: 4px; }
-        button { background-color: #2c3e50; color: white; cursor: pointer; border: none; font-weight: bold; }
-        button:hover { background-color: #34495e; }
+        /* Área de Input */
+        .input-group { display: flex; gap: 10px; margin-bottom: 20px; background: #ecf0f1; padding: 15px; border-radius: 5px; flex-wrap: wrap; }
+        input, select, button { padding: 12px; border: 1px solid #bdc3c7; border-radius: 4px; font-size: 14px; }
+        input[type="text"] { flex-grow: 1; }
+        button { background-color: #2c3e50; color: white; cursor: pointer; border: none; font-weight: bold; transition: 0.3s; }
+        button:hover { background-color: #34495e; transform: scale(1.02); }
 
-        /* Tabela de Rastreio (Logs) */
+        /* Barra de Busca */
+        .search-container { margin-bottom: 20px; }
+        .search-bar { width: 100%; padding: 15px; border: 2px solid #2c3e50; border-radius: 5px; font-size: 16px; background-color: #fffde7; }
+
+        /* Tabela de Logs */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
-        th { background-color: #2c3e50; color: white; }
-        tr:hover { background-color: #f9f9f9; }
+        th, td { text-align: left; padding: 15px; border-bottom: 1px solid #ddd; }
+        th { background-color: #2c3e50; color: white; position: sticky; top: 0; }
+        tr:hover { background-color: #f1f1f1; }
         
-        /* Status Badges */
-        .status { padding: 4px 8px; border-radius: 12px; font-size: 0.85em; font-weight: bold; }
-        .open { background-color: #e67e22; color: white; } /* Laranja: Aberto */
-        .closed { background-color: #27ae60; color: white; } /* Verde: Finalizado */
-        .deleted { background-color: #c0392b; color: white; } /* Vermelho: Inativo */
+        /* Badges de Status */
+        .status { padding: 5px 10px; border-radius: 15px; font-size: 0.8em; font-weight: bold; text-transform: uppercase; }
+        .open { background-color: #e67e22; color: white; } /* Aberto / Pendente */
+        .closed { background-color: #27ae60; color: white; } /* Concluído / Publicado */
+        .deleted { background-color: #c0392b; color: white; } /* Desativado / Inativo */
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>GAC - Protocolo de Documentos</h2>
+    <h2>GAC - Sistema de Gestão e Compliance <span>v2.0</span></h2>
     
     <div class="input-group">
-        <input type="text" id="docName" placeholder="Nome do Documento (Ex: Rescisão SEDUC)">
+        <input type="text" id="docName" placeholder="Nome do Documento (Ex: Relatório CIEE)">
         <select id="docType">
-            <option value="JUR">Direito (JUR)</option>
             <option value="TI">Tecnologia (TI)</option>
-            <option value="ADM">Adm/Financeiro (ADM)</option>
+            <option value="JUR">Direito (JUR)</option>
+            <option value="ADM">Administrativo (ADM)</option>
         </select>
-        <button onclick="addDocument()">Gerar Protocolo e Salvar</button>
+        <button onclick="addDocument()">Gerar e Registrar</button>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-bar" onkeyup="filterTable()" placeholder="🔍 Localizar protocolo, nome ou tipo...">
     </div>
 
     <table>
         <thead>
             <tr>
                 <th>Data/Hora</th>
-                <th>Protocolo (Nome do Arquivo)</th>
-                <th>Tipo</th>
+                <th>Protocolo de Rastreio</th>
+                <th>Categoria</th>
                 <th>Status</th>
             </tr>
         </thead>
         <tbody id="logTable">
+            <tr>
+                <td>01/04/2026 00:05</td>
+                <td><strong>20260401_TI_GITHUB_GAC_DEPLOY</strong></td>
+                <td>TI</td>
+                <td><span class="status closed">Concluído</span></td>
+            </tr>
+            <tr>
+                <td>01/04/2026 00:01</td>
+                <td><strong>20260401_TI_ESTAGIO_CIEE_WAIT</strong></td>
+                <td>TI</td>
+                <td><span class="status open">Aguardando</span></td>
+            </tr>
             <tr>
                 <td>31/03/2026 21:54</td>
                 <td><strong>20260331_TI_GOOGLE_ACCOUNT_OFF</strong></td>
@@ -64,17 +86,12 @@
                 <td>ADM</td>
                 <td><span class="status closed">Publicado</span></td>
             </tr>
-            <tr>
-                <td>25/03/2026 08:00</td>
-                <td><strong>20260325_JUR_CONTRATO_AOE_FIM</strong></td>
-                <td>JUR</td>
-                <td><span class="status open">Aguardando Baixa</span></td>
-            </tr>
         </tbody>
     </table>
 </div>
 
 <script>
+    // Função para Adicionar Novo Documento (Memória Local)
     function addDocument() {
         const name = document.getElementById('docName').value;
         const type = document.getElementById('docType').value;
@@ -82,12 +99,15 @@
         const dateStr = date.toISOString().slice(0, 10).replace(/-/g, '');
         const timeStr = date.toLocaleTimeString();
 
-        if(name === "") return alert("Digite o nome do documento!");
+        if(name === "") {
+            alert("Erro de Admin: Nome do documento é obrigatório.");
+            return;
+        }
 
         const table = document.getElementById('logTable');
-        const row = table.insertRow(0); // Adiciona no topo como log de auditoria
+        const row = table.insertRow(0);
         
-        // Formato do Protocolo GAC: YYYYMMDD_TIPO_NOME
+        // Algoritmo de Protocolo: DATA_TIPO_NOME
         const protocol = `${dateStr}_${type}_${name.toUpperCase().replace(/ /g, '_')}`;
 
         row.innerHTML = `
@@ -97,7 +117,31 @@
             <td><span class="status open">Aberto</span></td>
         `;
         
-        document.getElementById('docName').value = ""; // Limpa input
+        document.getElementById('docName').value = "";
+    }
+
+    // Função de Localização Inteligente (Filtro)
+    function filterTable() {
+        let input = document.getElementById("searchInput");
+        let filter = input.value.toUpperCase();
+        let table = document.getElementById("logTable");
+        let tr = table.getElementsByTagName("tr");
+
+        for (let i = 0; i < tr.length; i++) {
+            let tdProtocol = tr[i].getElementsByTagName("td")[1];
+            let tdType = tr[i].getElementsByTagName("td")[2];
+            
+            if (tdProtocol || tdType) {
+                let txtProtocol = tdProtocol.textContent || tdProtocol.innerText;
+                let txtType = tdType.textContent || tdType.innerText;
+                
+                if (txtProtocol.toUpperCase().indexOf(filter) > -1 || txtType.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
     }
 </script>
 
