@@ -9,24 +9,24 @@
         .container { max-width: 1100px; margin: auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         h2 { border-bottom: 3px solid #2c3e50; padding-bottom: 10px; color: #2c3e50; display: flex; justify-content: space-between; align-items: center; }
         
-        /* Área de Controle */
+        /* Painel de Controle Admin */
         .control-panel { display: flex; gap: 10px; margin-bottom: 20px; background: #2c3e50; padding: 20px; border-radius: 5px; flex-wrap: wrap; align-items: center; }
         input, select, button { padding: 12px; border: 1px solid #bdc3c7; border-radius: 4px; font-size: 14px; }
         input[type="text"] { flex-grow: 2; }
         .btn-add { background-color: #27ae60; color: white; cursor: pointer; border: none; font-weight: bold; transition: 0.3s; flex-grow: 1; }
         .btn-add:hover { background-color: #219150; }
 
-        /* Barra de Busca */
+        /* Barra de Busca Amarela (Filtro) */
         .search-bar { width: 100%; padding: 15px; border: 2px solid #2c3e50; border-radius: 5px; font-size: 16px; background-color: #fffde7; margin-bottom: 20px; box-sizing: border-box; }
 
-        /* Tabela */
+        /* Tabela de Auditoria */
         table { width: 100%; border-collapse: collapse; }
         th, td { text-align: left; padding: 15px; border-bottom: 1px solid #ddd; }
         th { background-color: #34495e; color: white; }
         tr:hover { background-color: #f9f9f9; }
         
-        /* Badges de Status Interativos */
-        .status { padding: 6px 12px; border-radius: 20px; font-size: 0.75em; font-weight: bold; text-transform: uppercase; cursor: pointer; border: none; display: inline-block; text-align: center; min-width: 90px; }
+        /* Status Coloridos */
+        .status { padding: 6px 12px; border-radius: 20px; font-size: 0.75em; font-weight: bold; text-transform: uppercase; cursor: pointer; border: none; display: inline-block; text-align: center; min-width: 100px; }
         .status-open { background-color: #e67e22; color: white; }
         .status-closed { background-color: #27ae60; color: white; }
         .status-deleted { background-color: #c0392b; color: white; }
@@ -37,7 +37,7 @@
 <body>
 
 <div class="container">
-    <h2>GAC - Sistema de Gestão e Compliance <span class="version-tag">v3.0 - Admin Mode</span></h2>
+    <h2>GAC - Gestão e Compliance <span class="version-tag">v3.1 Final - Persistência Ativada</span></h2>
     
     <div class="control-panel">
         <input type="text" id="docName" placeholder="Nome do Documento ou Processo">
@@ -54,36 +54,29 @@
         <button class="btn-add" onclick="addDocument()">REGISTRAR PROTOCOLO</button>
     </div>
 
-    <input type="text" id="searchInput" class="search-bar" onkeyup="filterTable()" placeholder="🔍 Localizar por Protocolo, Tipo ou Documento...">
+    <input type="text" id="searchInput" class="search-bar" onkeyup="filterTable()" placeholder="🔍 Pesquisar protocolo ou documento salvo...">
 
-    <table id="mainTable">
+    <table>
         <thead>
             <tr>
                 <th>Data/Registro</th>
                 <th>Protocolo de Rastreio</th>
                 <th>Categoria</th>
-                <th>Status (Clique p/ mudar)</th>
+                <th>Status (Clique p/ excluir)</th>
             </tr>
         </thead>
         <tbody id="logTable">
-            <tr>
-                <td>01/04/2026 00:30</td>
-                <td><strong>20260401_TI_GAC_V3_UPGRADE</strong></td>
-                <td>TI</td>
-                <td><button class="status status-closed" onclick="toggleStatus(this)">CONCLUÍDO</button></td>
-            </tr>
-            <tr>
-                <td>01/04/2026 00:01</td>
-                <td><strong>20260401_TI_ESTAGIO_CIEE_LISTA</strong></td>
-                <td>TI</td>
-                <td><button class="status status-open" onclick="toggleStatus(this)">PENDENTE</button></td>
-            </tr>
-        </tbody>
+            </tbody>
     </table>
 </div>
 
 <script>
-    // Gerar e Adicionar na Tabela
+    // Iniciar sistema carregando os dados do navegador
+    window.onload = function() {
+        renderTable();
+    };
+
+    // Função para Adicionar e Salvar
     function addDocument() {
         const name = document.getElementById('docName').value;
         const type = document.getElementById('docType').value;
@@ -94,41 +87,60 @@
 
         if(!name) { alert("Admin: Digite o nome do documento."); return; }
 
-        const table = document.getElementById('logTable');
-        const row = table.insertRow(0);
         const protocol = `${dateStr}_${type}_${name.toUpperCase().replace(/ /g, '_')}`;
-
-        // Mapeamento de texto do status
         const statusText = status === 'open' ? 'PENDENTE' : status === 'closed' ? 'CONCLUÍDO' : 'CANCELADO';
 
-        row.innerHTML = `
-            <td>${date.toLocaleDateString()} ${timeStr}</td>
-            <td><strong>${protocol}</strong></td>
-            <td>${type}</td>
-            <td><button class="status status-${status}" onclick="toggleStatus(this)">${statusText}</button></td>
-        `;
-        
-        document.getElementById('docName').value = "";
+        const newLog = {
+            timestamp: `${date.toLocaleDateString()} ${timeStr}`,
+            protocol: protocol,
+            type: type,
+            status: status,
+            statusText: statusText
+        };
+
+        // Salvar no Banco Local (LocalStorage)
+        let logs = JSON.parse(localStorage.getItem('gac_logs')) || [];
+        logs.unshift(newLog); // Novo registro no topo
+        localStorage.setItem('gac_logs', JSON.stringify(logs));
+
+        renderTable();
+        document.getElementById('docName').value = ""; // Limpar campo
     }
 
-    // Função para alternar status ao clicar no botão da tabela
-    function toggleStatus(btn) {
-        if (btn.classList.contains('status-open')) {
-            btn.classList.remove('status-open');
-            btn.classList.add('status-closed');
-            btn.innerText = 'CONCLUÍDO';
-        } else if (btn.classList.contains('status-closed')) {
-            btn.classList.remove('status-closed');
-            btn.classList.add('status-deleted');
-            btn.innerText = 'CANCELADO';
-        } else {
-            btn.classList.remove('status-deleted');
-            btn.classList.add('status-open');
-            btn.innerText = 'PENDENTE';
+    // Desenhar a tabela na tela
+    function renderTable() {
+        const table = document.getElementById('logTable');
+        table.innerHTML = ""; 
+        
+        let logs = JSON.parse(localStorage.getItem('gac_logs')) || [];
+
+        if (logs.length === 0) {
+            table.innerHTML = "<tr><td colspan='4' style='text-align:center;'>Nenhum protocolo registrado neste navegador.</td></tr>";
+            return;
+        }
+
+        logs.forEach((log, index) => {
+            const row = table.insertRow();
+            row.innerHTML = `
+                <td>${log.timestamp}</td>
+                <td><strong>${log.protocol}</strong></td>
+                <td>${log.type}</td>
+                <td><button class="status status-${log.status}" onclick="removeLog(${index})">${log.statusText}</button></td>
+            `;
+        });
+    }
+
+    // Deletar registro do banco
+    function removeLog(index) {
+        if(confirm("Deseja apagar este registro do histórico local?")) {
+            let logs = JSON.parse(localStorage.getItem('gac_logs'));
+            logs.splice(index, 1);
+            localStorage.setItem('gac_logs', JSON.stringify(logs));
+            renderTable();
         }
     }
 
-    // Filtro de Localização Inteligente
+    // Filtro de Busca
     function filterTable() {
         let input = document.getElementById("searchInput").value.toUpperCase();
         let tr = document.getElementById("logTable").getElementsByTagName("tr");
