@@ -3,88 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GAC - Gestão, Compliance e Finanças</title>
+    <title>GAC v5.0 - Gestão, Compliance e Prazos</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 20px; color: #333; }
-        .container { max-width: 1100px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         .header { border-bottom: 3px solid #2c3e50; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; }
         .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
         .tab-btn { padding: 12px 25px; cursor: pointer; border: none; border-radius: 5px; font-weight: bold; background: #ddd; transition: 0.3s; }
         .tab-btn.active { background: #2c3e50; color: white; }
         .panel { display: none; background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px; }
         .panel.active { display: block; }
-        .input-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .input-group { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
         input, select, button { padding: 12px; border: 1px solid #ccc; border-radius: 5px; }
         .btn-reg { background: #27ae60; color: white; border: none; cursor: pointer; font-weight: bold; flex-grow: 1; }
-        .fin-summary { display: flex; gap: 15px; margin-bottom: 20px; }
+        
+        /* Financeiro e Alertas */
+        .summary-cards { display: flex; gap: 15px; margin-bottom: 20px; }
         .card { flex: 1; padding: 15px; border-radius: 8px; text-align: center; color: white; font-weight: bold; }
-        .bg-blue { background: #2980b9; } .bg-green { background: #27ae60; } .bg-red { background: #c0392b; }
+        .bg-blue { background: #2980b9; } .bg-green { background: #27ae60; } .bg-red { background: #c0392b; } .bg-orange { background: #e67e22; }
+
         .search-bar { width: 100%; padding: 15px; border: 2px solid #2c3e50; border-radius: 8px; background: #fffde7; margin-bottom: 20px; box-sizing: border-box; font-size: 16px; }
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
         th { background: #2c3e50; color: white; }
         
-        /* Badges de Status Interativos */
-        .status { padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; cursor: pointer; border: none; color: white; text-align: center; min-width: 100px; display: inline-block; transition: 0.2s; }
-        .open { background: #e67e22; } /* PENDENTE */
-        .closed { background: #27ae60; } /* CONCLUÍDO */
-        .deleted { background: #c0392b; } /* CANCELADO */
-        .status:hover { opacity: 0.8; transform: scale(1.05); }
-        .btn-del { background: none; border: none; color: #bbb; cursor: pointer; font-size: 16px; margin-left: 10px; }
-        .btn-del:hover { color: #c0392b; }
+        /* Status e Prazos */
+        .status { padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; cursor: pointer; border: none; color: white; min-width: 80px; }
+        .open { background: #e67e22; } .closed { background: #27ae60; } .deleted { background: #c0392b; }
+        .deadline-alert { font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
+        .ontime { color: #27ae60; border: 1px solid #27ae60; }
+        .today { color: #d35400; background: #fef5e7; border: 1px solid #d35400; animation: pulse 2s infinite; }
+        .late { color: #c0392b; background: #f9ebeb; border: 1px solid #c0392b; }
+        
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h2>GAC SYSTEM <span style="font-size: 12px; background: #eee; padding: 5px; border-radius: 5px;">v4.1 Final</span></h2>
+        <h2>GAC SYSTEM <span style="font-size: 12px; background: #eee; padding: 5px; border-radius: 5px;">v5.0 - Gestão de Prazos</span></h2>
         <div id="clock" style="font-weight: bold; color: #7f8c8d;"></div>
     </div>
 
     <div class="nav-tabs">
-        <button class="tab-btn active" onclick="openTab('protocolos')">📁 PROTOCOLOS</button>
+        <button class="tab-btn active" onclick="openTab('protocolos')">📁 PROTOCOLOS & PRAZOS</button>
         <button class="tab-btn" onclick="openTab('financeiro')">💰 FINANCEIRO</button>
     </div>
 
     <div id="protocolos" class="panel active">
         <div class="input-group">
-            <input type="text" id="docName" placeholder="Nome do Documento/Processo" style="flex-grow: 2;">
+            <input type="text" id="docName" placeholder="Documento / Processo" style="flex-grow: 2;">
             <select id="docType">
                 <option value="TI">TI</option>
                 <option value="JUR">JUR</option>
                 <option value="ADM">ADM</option>
             </select>
-            <button class="btn-reg" onclick="addProtocol()">REGISTRAR PROTOCOLO</button>
+            <label style="font-size: 12px; color: #666;">Vencimento:</label>
+            <input type="date" id="docDeadline">
+            <button class="btn-reg" onclick="addProtocol()">REGISTRAR COM PRAZO</button>
         </div>
     </div>
 
     <div id="financeiro" class="panel">
-        <div class="fin-summary">
+        <div class="summary-cards">
             <div class="card bg-green">Entradas: <span id="sumIn">R$ 0,00</span></div>
             <div class="card bg-red">Saídas: <span id="sumOut">R$ 0,00</span></div>
             <div class="card bg-blue">Saldo: <span id="sumTotal">R$ 0,00</span></div>
         </div>
         <div class="input-group">
-            <input type="text" id="finDesc" placeholder="Descrição (Ex: Honorário, CIEE...)" style="flex-grow: 2;">
+            <input type="text" id="finDesc" placeholder="Descrição Financeira" style="flex-grow: 2;">
             <input type="number" id="finVal" placeholder="R$ 0,00">
             <select id="finType">
                 <option value="in">Entrada (+)</option>
                 <option value="out">Saída (-)</option>
             </select>
-            <button class="btn-reg" onclick="addFinance()">LANÇAR FINANCEIRO</button>
+            <button class="btn-reg" onclick="addFinance()">LANÇAR VALOR</button>
         </div>
     </div>
 
-    <input type="text" id="searchInput" class="search-bar" onkeyup="filterTable()" placeholder="🔍 Pesquisa Inteligente GAC (Busca por Protocolo, Nome ou Categoria)...">
+    <input type="text" id="searchInput" class="search-bar" onkeyup="filterTable()" placeholder="🔍 Localizar por Protocolo, Prazo ou Categoria...">
 
     <table>
         <thead>
             <tr>
-                <th>Data/Hora</th>
-                <th>Detalhes / Protocolo</th>
-                <th>Categoria</th>
-                <th>Status / Valor (Clique p/ Mudar)</th>
+                <th>Registro</th>
+                <th>Protocolo / Descrição</th>
+                <th>Cat.</th>
+                <th>Vencimento / Alerta</th>
+                <th>Ação</th>
             </tr>
         </thead>
         <tbody id="masterTable"></tbody>
@@ -111,10 +118,23 @@
     function addProtocol() {
         const name = document.getElementById('docName').value;
         const type = document.getElementById('docType').value;
-        if(!name) return alert("Informe o documento.");
+        const deadline = document.getElementById('docDeadline').value;
+        if(!name || !deadline) return alert("Informe o nome e o prazo de vencimento.");
+
         const date = new Date();
         const protocol = `${date.getFullYear()}${String(date.getMonth()+1).padStart(2,'0')}${String(date.getDate()).padStart(2,'0')}_${type}_${name.toUpperCase().replace(/ /g,'_')}`;
-        const item = { id: Date.now(), date: date.toLocaleString(), detail: protocol, cat: type, status: 'open', statusText: 'PENDENTE', val: 0, isFin: false };
+        
+        const item = { 
+            id: Date.now(), 
+            date: date.toLocaleString(), 
+            detail: protocol, 
+            cat: type, 
+            status: 'open', 
+            deadline: deadline,
+            val: 0, 
+            isFin: false 
+        };
+
         saveItem(item);
         document.getElementById('docName').value = "";
     }
@@ -124,7 +144,18 @@
         const val = parseFloat(document.getElementById('finVal').value);
         const type = document.getElementById('finType').value;
         if(!desc || isNaN(val)) return alert("Preencha os valores financeiros.");
-        const item = { id: Date.now(), date: new Date().toLocaleString(), detail: desc.toUpperCase(), cat: 'FIN', status: type === 'in' ? 'closed' : 'deleted', statusText: type === 'in' ? 'RECEBIDO' : 'PAGO', val: val, isFin: true };
+
+        const item = { 
+            id: Date.now(), 
+            date: new Date().toLocaleString(), 
+            detail: desc.toUpperCase(), 
+            cat: 'FIN', 
+            status: type === 'in' ? 'closed' : 'deleted', 
+            deadline: null,
+            val: val,
+            isFin: true 
+        };
+
         saveItem(item);
         document.getElementById('finDesc').value = ""; document.getElementById('finVal').value = "";
     }
@@ -136,25 +167,18 @@
         renderAll();
     }
 
-    // NOVA FUNÇÃO: Alternar Status sem mudar a data
-    function toggleStatus(index) {
-        let db = JSON.parse(localStorage.getItem('gac_master'));
-        let item = db[index];
+    function calculateDeadline(deadlineStr) {
+        if (!deadlineStr) return { text: "-", class: "" };
+        
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        const deadline = new Date(deadlineStr + "T00:00:00");
+        const diffTime = deadline - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-        if (item.status === 'open') {
-            item.status = 'closed';
-            item.statusText = item.isFin ? 'RECEBIDO' : 'CONCLUÍDO';
-        } else if (item.status === 'closed') {
-            item.status = 'deleted';
-            item.statusText = item.isFin ? 'CANCELADO' : 'CANCELADO';
-        } else {
-            item.status = 'open';
-            item.statusText = item.isFin ? 'PENDENTE' : 'PENDENTE';
-        }
-
-        db[index] = item;
-        localStorage.setItem('gac_master', JSON.stringify(db));
-        renderAll();
+        if (diffDays < 0) return { text: `ATRASADO (${Math.abs(diffDays)}d)`, class: "late" };
+        if (diffDays === 0) return { text: "VENCE HOJE!", class: "today" };
+        return { text: `Faltam ${diffDays} dias`, class: "ontime" };
     }
 
     function renderAll() {
@@ -165,20 +189,21 @@
 
         db.forEach((item, index) => {
             const row = table.insertRow();
-            let displayVal = item.isFin ? `R$ ${item.val.toFixed(2)}` : item.statusText;
+            const deadlineInfo = calculateDeadline(item.deadline);
+            
+            let statusDisplay = item.isFin ? `R$ ${item.val.toFixed(2)}` : `<button class="status ${item.status}" onclick="toggleStatus(${index})">${item.status === 'open' ? 'ABERTO' : 'OK'}</button>`;
             
             if(item.isFin) {
-                if(item.status === 'closed') inTotal += item.val; else if(item.status === 'deleted') outTotal += item.val;
+                if(item.status === 'closed') inTotal += item.val; else inTotal -= 0; // Simplificado
+                if(item.status === 'deleted') outTotal += item.val;
             }
 
             row.innerHTML = `
-                <td>${item.date}</td>
+                <td><small>${item.date.split(',')[0]}</small></td>
                 <td><strong>${item.detail}</strong></td>
                 <td>${item.cat}</td>
-                <td>
-                    <button class="status ${item.status}" onclick="toggleStatus(${index})">${displayVal}</button>
-                    <button class="btn-del" onclick="deleteItem(${index})">🗑️</button>
-                </td>
+                <td><span class="deadline-alert ${deadlineInfo.class}">${deadlineInfo.text}</span><br><small>${item.deadline || ''}</small></td>
+                <td>${statusDisplay} <button onclick="deleteItem(${index})" style="border:none; background:none; cursor:pointer;">🗑️</button></td>
             `;
         });
 
@@ -187,8 +212,15 @@
         document.getElementById('sumTotal').innerText = `R$ ${(inTotal - outTotal).toFixed(2)}`;
     }
 
+    function toggleStatus(index) {
+        let db = JSON.parse(localStorage.getItem('gac_master'));
+        db[index].status = db[index].status === 'open' ? 'closed' : 'open';
+        localStorage.setItem('gac_master', JSON.stringify(db));
+        renderAll();
+    }
+
     function deleteItem(index) {
-        if(confirm("Excluir este registro permanentemente?")) {
+        if(confirm("Remover permanentemente?")) {
             let db = JSON.parse(localStorage.getItem('gac_master'));
             db.splice(index, 1);
             localStorage.setItem('gac_master', JSON.stringify(db));
@@ -200,9 +232,4 @@
         let input = document.getElementById("searchInput").value.toUpperCase();
         let tr = document.getElementById("masterTable").getElementsByTagName("tr");
         for (let i = 0; i < tr.length; i++) {
-            tr[i].style.display = tr[i].innerText.toUpperCase().indexOf(input) > -1 ? "" : "none";
-        }
-    }
-</script>
-</body>
-</html>
+            tr[i].style
