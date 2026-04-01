@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>GAC - Gestão Administrativa e Compliance</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; color: #333; margin: 20px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { border-bottom: 2px solid #2c3e50; padding-bottom: 10px; color: #2c3e50; }
+        
+        /* Formulário de Input */
+        .input-group { display: flex; gap: 10px; margin-bottom: 30px; background: #ecf0f1; padding: 15px; border-radius: 5px; }
+        input, select, button { padding: 10px; border: 1px solid #bdc3c7; border-radius: 4px; }
+        button { background-color: #2c3e50; color: white; cursor: pointer; border: none; font-weight: bold; }
+        button:hover { background-color: #34495e; }
+
+        /* Tabela de Rastreio (Logs) */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
+        th { background-color: #2c3e50; color: white; }
+        tr:hover { background-color: #f9f9f9; }
+        
+        /* Status Badges */
+        .status { padding: 4px 8px; border-radius: 12px; font-size: 0.85em; font-weight: bold; }
+        .open { background-color: #e67e22; color: white; } /* Laranja: Aberto */
+        .closed { background-color: #27ae60; color: white; } /* Verde: Finalizado */
+        .deleted { background-color: #c0392b; color: white; } /* Vermelho: Inativo */
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>GAC - Protocolo de Documentos</h2>
+    
+    <div class="input-group">
+        <input type="text" id="docName" placeholder="Nome do Documento (Ex: Rescisão SEDUC)">
+        <select id="docType">
+            <option value="JUR">Direito (JUR)</option>
+            <option value="TI">Tecnologia (TI)</option>
+            <option value="ADM">Adm/Financeiro (ADM)</option>
+        </select>
+        <button onclick="addDocument()">Gerar Protocolo e Salvar</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Data/Hora</th>
+                <th>Protocolo (Nome do Arquivo)</th>
+                <th>Tipo</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="logTable">
+            <tr>
+                <td>31/03/2026 21:54</td>
+                <td><strong>20260331_TI_GOOGLE_ACCOUNT_OFF</strong></td>
+                <td>TI</td>
+                <td><span class="status deleted">Desativada</span></td>
+            </tr>
+            <tr>
+                <td>31/03/2026 15:30</td>
+                <td><strong>20260331_ADM_OFICIO_SEDUC_01</strong></td>
+                <td>ADM</td>
+                <td><span class="status closed">Publicado</span></td>
+            </tr>
+            <tr>
+                <td>25/03/2026 08:00</td>
+                <td><strong>20260325_JUR_CONTRATO_AOE_FIM</strong></td>
+                <td>JUR</td>
+                <td><span class="status open">Aguardando Baixa</span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function addDocument() {
+        const name = document.getElementById('docName').value;
+        const type = document.getElementById('docType').value;
+        const date = new Date();
+        const dateStr = date.toISOString().slice(0, 10).replace(/-/g, '');
+        const timeStr = date.toLocaleTimeString();
+
+        if(name === "") return alert("Digite o nome do documento!");
+
+        const table = document.getElementById('logTable');
+        const row = table.insertRow(0); // Adiciona no topo como log de auditoria
+        
+        // Formato do Protocolo GAC: YYYYMMDD_TIPO_NOME
+        const protocol = `${dateStr}_${type}_${name.toUpperCase().replace(/ /g, '_')}`;
+
+        row.innerHTML = `
+            <td>${date.toLocaleDateString()} ${timeStr}</td>
+            <td><strong>${protocol}</strong></td>
+            <td>${type}</td>
+            <td><span class="status open">Aberto</span></td>
+        `;
+        
+        document.getElementById('docName').value = ""; // Limpa input
+    }
+</script>
+
+</body>
+</html>
