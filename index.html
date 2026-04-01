@@ -3,154 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GAC - Gestão Administrativa e Compliance</title>
+    <title>GAC - Gestão, Compliance e Finanças</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; color: #333; margin: 20px; }
-        .container { max-width: 1100px; margin: auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { border-bottom: 3px solid #2c3e50; padding-bottom: 10px; color: #2c3e50; display: flex; justify-content: space-between; align-items: center; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 20px; color: #333; }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         
-        /* Painel de Controle Admin */
-        .control-panel { display: flex; gap: 10px; margin-bottom: 20px; background: #2c3e50; padding: 20px; border-radius: 5px; flex-wrap: wrap; align-items: center; }
-        input, select, button { padding: 12px; border: 1px solid #bdc3c7; border-radius: 4px; font-size: 14px; }
-        input[type="text"] { flex-grow: 2; }
-        .btn-add { background-color: #27ae60; color: white; cursor: pointer; border: none; font-weight: bold; transition: 0.3s; flex-grow: 1; }
-        .btn-add:hover { background-color: #219150; }
+        /* Cabeçalho e Navegação */
+        .header { border-bottom: 3px solid #2c3e50; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; }
+        .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { padding: 12px 25px; cursor: pointer; border: none; border-radius: 5px; font-weight: bold; background: #ddd; transition: 0.3s; }
+        .tab-btn.active { background: #2c3e50; color: white; }
 
-        /* Barra de Busca Amarela (Filtro) */
-        .search-bar { width: 100%; padding: 15px; border: 2px solid #2c3e50; border-radius: 5px; font-size: 16px; background-color: #fffde7; margin-bottom: 20px; box-sizing: border-box; }
+        /* Painéis de Controle */
+        .panel { display: none; background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px; }
+        .panel.active { display: block; }
+        .input-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        input, select, button { padding: 12px; border: 1px solid #ccc; border-radius: 5px; }
+        .btn-reg { background: #27ae60; color: white; border: none; cursor: pointer; font-weight: bold; flex-grow: 1; }
 
-        /* Tabela de Auditoria */
+        /* Financeiro Cards */
+        .fin-summary { display: flex; gap: 15px; margin-bottom: 20px; }
+        .card { flex: 1; padding: 15px; border-radius: 8px; text-align: center; color: white; font-weight: bold; }
+        .bg-blue { background: #2980b9; } .bg-green { background: #27ae60; } .bg-red { background: #c0392b; }
+
+        /* Filtro e Tabela */
+        .search-bar { width: 100%; padding: 15px; border: 2px solid #2c3e50; border-radius: 8px; background: #fffde7; margin-bottom: 20px; box-sizing: border-box; font-size: 16px; }
         table { width: 100%; border-collapse: collapse; }
-        th, td { text-align: left; padding: 15px; border-bottom: 1px solid #ddd; }
-        th { background-color: #34495e; color: white; }
-        tr:hover { background-color: #f9f9f9; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #2c3e50; color: white; }
         
-        /* Status Coloridos */
-        .status { padding: 6px 12px; border-radius: 20px; font-size: 0.75em; font-weight: bold; text-transform: uppercase; cursor: pointer; border: none; display: inline-block; text-align: center; min-width: 100px; }
-        .status-open { background-color: #e67e22; color: white; }
-        .status-closed { background-color: #27ae60; color: white; }
-        .status-deleted { background-color: #c0392b; color: white; }
-        
-        .version-tag { font-size: 12px; background: #eee; padding: 4px 8px; border-radius: 4px; }
+        /* Status Badges */
+        .status { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; border: none; color: white; }
+        .open { background: #e67e22; } .closed { background: #27ae60; } .deleted { background: #c0392b; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>GAC - Gestão e Compliance <span class="version-tag">v3.1 Final - Persistência Ativada</span></h2>
-    
-    <div class="control-panel">
-        <input type="text" id="docName" placeholder="Nome do Documento ou Processo">
-        <select id="docType">
-            <option value="TI">TI</option>
-            <option value="JUR">JURÍDICO</option>
-            <option value="ADM">ADM</option>
-        </select>
-        <select id="docStatus">
-            <option value="open">PENDENTE</option>
-            <option value="closed">CONCLUÍDO</option>
-            <option value="deleted">CANCELADO</option>
-        </select>
-        <button class="btn-add" onclick="addDocument()">REGISTRAR PROTOCOLO</button>
+    <div class="header">
+        <h2>GAC SYSTEM <span style="font-size: 14px; background: #eee; padding: 5px; border-radius: 5px;">v4.0 Final</span></h2>
+        <div id="clock" style="font-weight: bold; color: #7f8c8d;"></div>
     </div>
 
-    <input type="text" id="searchInput" class="search-bar" onkeyup="filterTable()" placeholder="🔍 Pesquisar protocolo ou documento salvo...">
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="openTab('protocolos')">📁 PROTOCOLOS</button>
+        <button class="tab-btn" onclick="openTab('financeiro')">💰 FINANCEIRO</button>
+    </div>
 
-    <table>
+    <div id="protocolos" class="panel active">
+        <div class="input-group">
+            <input type="text" id="docName" placeholder="Nome do Documento/Processo" style="flex-grow: 2;">
+            <select id="docType">
+                <option value="TI">TI</option>
+                <option value="JUR">JUR</option>
+                <option value="ADM">ADM</option>
+            </select>
+            <button class="btn-reg" onclick="addProtocol()">REGISTRAR</button>
+        </div>
+    </div>
+
+    <div id="financeiro" class="panel">
+        <div class="fin-summary">
+            <div class="card bg-green">Entradas: <span id="sumIn">R$ 0,00</span></div>
+            <div class="card bg-red">Saídas: <span id="sumOut">R$ 0,00</span></div>
+            <div class="card bg-blue">Saldo: <span id="sumTotal">R$ 0,00</span></div>
+        </div>
+        <div class="input-group">
+            <input type="text" id="finDesc" placeholder="Descrição (Ex: Honorário, CIEE...)" style="flex-grow: 2;">
+            <input type="number" id="finVal" placeholder="R$ 0,00">
+            <select id="finType">
+                <option value="in">Entrada (+)</option>
+                <option value="out">Saída (-)</option>
+            </select>
+            <button class="btn-reg" onclick="addFinance()">LANÇAR</button>
+        </div>
+    </div>
+
+    <input type="text" id="searchInput" class="search-bar" onkeyup="filterTable()" placeholder="🔍 Pesquisa Inteligente GAC (Localize qualquer registro salvo)...">
+
+    <table id="mainTable">
         <thead>
             <tr>
                 <th>Data/Registro</th>
-                <th>Protocolo de Rastreio</th>
+                <th>Detalhes / Protocolo</th>
                 <th>Categoria</th>
-                <th>Status (Clique p/ excluir)</th>
+                <th>Status / Valor</th>
             </tr>
         </thead>
-        <tbody id="logTable">
-            </tbody>
+        <tbody id="masterTable"></tbody>
     </table>
 </div>
 
 <script>
-    // Iniciar sistema carregando os dados do navegador
+    // Gerenciar Abas
+    function openTab(tabName) {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabName).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    // Carregar dados ao iniciar
     window.onload = function() {
-        renderTable();
+        updateClock();
+        setInterval(updateClock, 1000);
+        renderAll();
     };
 
-    // Função para Adicionar e Salvar
-    function addDocument() {
+    function updateClock() {
+        document.getElementById('clock').innerText = new Date().toLocaleString();
+    }
+
+    // --- LÓGICA DE PROTOCOLOS ---
+    function addProtocol() {
         const name = document.getElementById('docName').value;
         const type = document.getElementById('docType').value;
-        const status = document.getElementById('docStatus').value;
+        if(!name) return alert("Informe o documento.");
+
         const date = new Date();
-        const dateStr = date.toISOString().slice(0, 10).replace(/-/g, '');
-        const timeStr = date.toLocaleTimeString();
-
-        if(!name) { alert("Admin: Digite o nome do documento."); return; }
-
-        const protocol = `${dateStr}_${type}_${name.toUpperCase().replace(/ /g, '_')}`;
-        const statusText = status === 'open' ? 'PENDENTE' : status === 'closed' ? 'CONCLUÍDO' : 'CANCELADO';
-
-        const newLog = {
-            timestamp: `${date.toLocaleDateString()} ${timeStr}`,
-            protocol: protocol,
-            type: type,
-            status: status,
-            statusText: statusText
+        const protocol = `${date.getFullYear()}${String(date.getMonth()+1).padStart(2,'0')}${String(date.getDate()).padStart(2,'0')}_${type}_${name.toUpperCase().replace(/ /g,'_')}`;
+        
+        const item = { 
+            id: Date.now(), 
+            date: date.toLocaleString(), 
+            detail: protocol, 
+            cat: type, 
+            status: 'open', 
+            val: 'PENDENTE',
+            isFin: false 
         };
 
-        // Salvar no Banco Local (LocalStorage)
-        let logs = JSON.parse(localStorage.getItem('gac_logs')) || [];
-        logs.unshift(newLog); // Novo registro no topo
-        localStorage.setItem('gac_logs', JSON.stringify(logs));
-
-        renderTable();
-        document.getElementById('docName').value = ""; // Limpar campo
+        saveItem(item);
+        document.getElementById('docName').value = "";
     }
 
-    // Desenhar a tabela na tela
-    function renderTable() {
-        const table = document.getElementById('logTable');
-        table.innerHTML = ""; 
-        
-        let logs = JSON.parse(localStorage.getItem('gac_logs')) || [];
+    // --- LÓGICA FINANCEIRA ---
+    function addFinance() {
+        const desc = document.getElementById('finDesc').value;
+        const val = parseFloat(document.getElementById('finVal').value);
+        const type = document.getElementById('finType').value;
+        if(!desc || isNaN(val)) return alert("Preencha os valores financeiros.");
 
-        if (logs.length === 0) {
-            table.innerHTML = "<tr><td colspan='4' style='text-align:center;'>Nenhum protocolo registrado neste navegador.</td></tr>";
-            return;
-        }
+        const item = { 
+            id: Date.now(), 
+            date: new Date().toLocaleString(), 
+            detail: desc.toUpperCase(), 
+            cat: 'FIN', 
+            status: type === 'in' ? 'closed' : 'deleted', 
+            val: val,
+            isFin: true 
+        };
 
-        logs.forEach((log, index) => {
+        saveItem(item);
+        document.getElementById('finDesc').value = "";
+        document.getElementById('finVal').value = "";
+    }
+
+    function saveItem(item) {
+        let db = JSON.parse(localStorage.getItem('gac_master')) || [];
+        db.unshift(item);
+        localStorage.setItem('gac_master', JSON.stringify(db));
+        renderAll();
+    }
+
+    function renderAll() {
+        const table = document.getElementById('masterTable');
+        table.innerHTML = "";
+        let db = JSON.parse(localStorage.getItem('gac_master')) || [];
+        let inTotal = 0, outTotal = 0;
+
+        db.forEach((item, index) => {
             const row = table.insertRow();
+            let valDisplay = item.isFin ? `R$ ${item.val.toFixed(2)}` : `<span class="status ${item.status}">${item.val}</span>`;
+            
+            if(item.isFin) {
+                if(item.status === 'closed') inTotal += item.val; else outTotal += item.val;
+            }
+
             row.innerHTML = `
-                <td>${log.timestamp}</td>
-                <td><strong>${log.protocol}</strong></td>
-                <td>${log.type}</td>
-                <td><button class="status status-${log.status}" onclick="removeLog(${index})">${log.statusText}</button></td>
+                <td>${item.date}</td>
+                <td><strong>${item.detail}</strong></td>
+                <td>${item.cat}</td>
+                <td>${valDisplay} <button onclick="deleteItem(${index})" style="background:none; border:none; color:#ccc; cursor:pointer; margin-left:10px;">[x]</button></td>
             `;
         });
+
+        document.getElementById('sumIn').innerText = `R$ ${inTotal.toFixed(2)}`;
+        document.getElementById('sumOut').innerText = `R$ ${outTotal.toFixed(2)}`;
+        document.getElementById('sumTotal').innerText = `R$ ${(inTotal - outTotal).toFixed(2)}`;
     }
 
-    // Deletar registro do banco
-    function removeLog(index) {
-        if(confirm("Deseja apagar este registro do histórico local?")) {
-            let logs = JSON.parse(localStorage.getItem('gac_logs'));
-            logs.splice(index, 1);
-            localStorage.setItem('gac_logs', JSON.stringify(logs));
-            renderTable();
+    function deleteItem(index) {
+        if(confirm("Excluir este registro permanentemente?")) {
+            let db = JSON.parse(localStorage.getItem('gac_master'));
+            db.splice(index, 1);
+            localStorage.setItem('gac_master', JSON.stringify(db));
+            renderAll();
         }
     }
 
-    // Filtro de Busca
     function filterTable() {
         let input = document.getElementById("searchInput").value.toUpperCase();
-        let tr = document.getElementById("logTable").getElementsByTagName("tr");
-
+        let tr = document.getElementById("masterTable").getElementsByTagName("tr");
         for (let i = 0; i < tr.length; i++) {
-            let text = tr[i].innerText.toUpperCase();
-            tr[i].style.display = text.indexOf(input) > -1 ? "" : "none";
+            tr[i].style.display = tr[i].innerText.toUpperCase().indexOf(input) > -1 ? "" : "none";
         }
     }
 </script>
-
 </body>
 </html>
